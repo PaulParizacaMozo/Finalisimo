@@ -198,8 +198,9 @@ int main(){
             cout<<"[2] Setear Orden\n";
             cout<<"[3] Imprimir Arbol\n";
             cout<<"[4] Buscar Elemento\n";
-            cout<<"[5] Insertar Arbol\n";
-            cout<<"[6] Eliminar Arbol\n";
+            cout<<"[5] Insertar Registro\n";
+            cout<<"[6] Eliminar Registro\n";
+            cout<<"[7] Imprimir Sector\n";
             int opc4;
             cin>>opc4;
             cin.ignore();
@@ -224,11 +225,7 @@ int main(){
                 sistema.buscarElemento(aux);
             }
             else if (opc4 == 5) {
-                int aux;
-                cout<<" Ingrese el elemento que desea buscar: ";
-                cin>>aux;
-                cin.ignore();
-                sistema.tree.getCamino(aux);
+                sistema.insertarRegistro();
             }
             else if (opc4 == 6) {
                 int aux;
@@ -236,6 +233,13 @@ int main(){
                 cin>>aux;
                 cin.ignore();
                 sistema.BtreeDeleteRegistro(aux);
+            }
+            else if (opc4 == 7) {
+                int aux;
+                cout<<" Ingrese sector que desea ver: ";
+                cin>>aux;
+                cin.ignore();
+                sistema.VerSector(aux);
             }
         }
 

@@ -543,34 +543,29 @@ public:
     {
       sizeRegistro += get<2>(i);
     }
+    cout<<"Size Registro: "<<sizeRegistro<<endl;
 
     // cout<<1<<endl;
     int i;
     for (i = bloqueInicial; i <= bloqueFinal; i++)
     {
       char *frame = bufferManager->getPageOfBuuferPool(i)->data;
-      ifstream file;
-      file.open("disk/bloque" + to_string(i) + ".bin", ios::in | ios::binary);
-      file.read(frame, this->diskController->sizeBloque);
+      //ifstream file;
+      //file.open("disk/bloque" + to_string(i) + ".bin", ios::in | ios::binary);
+      //file.read(frame, this->diskController->sizeBloque);
 
       char marcador;
       int ptr;
       marcador = *reinterpret_cast<int *>(frame + sizeRegistro - 5);
-      if (marcador == '*')
-      {
+      if (marcador == '*'){
         break;
       }
-
       ptr = *reinterpret_cast<int *>(frame + sizeRegistro - 4);
       // cout<<"ptr-> "<<ptr<<endl;
-      if (ptr == 0)
-      {
-
-        // cout<<2<<endl;
+      if (ptr == 0){
         continue;
       }
-      else
-      {
+      else {
         int entero;
         double doble;
         string cad;
@@ -579,15 +574,21 @@ public:
         int sustiByte = sizeRegistro - 4;
 
         // cout<<2<<endl;
-        while (true)
-        {
+        while (true){
           ptr = get_integer(frame, sustiByte + ptr, 0);
           // cout<<"ptr-> "<<ptr<<endl;
-          if (ptr == 0)
-          {
-
+          if (ptr == 0){
             // cout<<"preptr-> "<<prePtr<<endl;
             *reinterpret_cast<int *>(&frame[aux + sustiByte]) = 0;
+
+            ///////////////////////
+          int clave_,bloque_,puntero_;
+          bool id = true;
+          bloque_ = i;
+          puntero_ = prePtr;
+            //////////////////////
+
+
 
             cout << " Ingrese los datos: \n";
             for (auto &i : this->diskController->info)
@@ -605,6 +606,10 @@ public:
                   entero = stoi(cad);
                 }
                 *reinterpret_cast<int *>(&frame[prePtr]) = entero;
+                if (id == true) {
+                  clave_ = entero;
+                  id = false;
+                }
                 prePtr += get<2>(i);
               }
               else if (get<1>(i) == "double")
@@ -638,6 +643,29 @@ public:
             save.open("disk/bloque" + to_string(i) + ".bin", ios::out | ios::binary);
             save.write(frame, diskController->sizeBloque);
             save.close();
+
+          //Add arbol bucket
+          tree.set(clave_,bloque_,puntero_);
+          cout<<" -> "<<clave_<<" - "<<bloque_<<" - "<<puntero_<<"\n";
+              int numRegistros;
+              int pos100 = this->diskController->buscarTablaenDictionary("BPLUS"+this->diskController->nameTable);
+              pos100 += 100;
+              fstream dictionary("dictionary/dictionary.bin", ios::in | ios::out | std::ios::binary);
+              dictionary.seekg(pos100);
+              dictionary.read(reinterpret_cast<char *>(&numRegistros), sizeof(int));
+              numRegistros++;
+              dictionary.seekp(pos100);
+              dictionary.write(reinterpret_cast<char *>(&numRegistros), sizeof(int));
+              dictionary.close();
+              pos100 = this->diskController->buscarTablaenDictionary(this->diskController->nameTable);
+              pos100 += 100;
+              fstream dictionary1("dictionary/dictionary.bin", ios::in | ios::out | std::ios::binary);
+              dictionary1.seekg(pos100);
+              dictionary1.read(reinterpret_cast<char *>(&numRegistros), sizeof(int));
+              numRegistros++;
+              dictionary1.seekp(pos100);
+              dictionary1.write(reinterpret_cast<char *>(&numRegistros), sizeof(int));
+              dictionary1.close();
             return;
           }
           else
@@ -648,12 +676,14 @@ public:
         }
       }
     }
-    ifstream file;
-    file.open("disk/bloque" + to_string(i - 1) + ".bin", ios::in | ios::binary);
+    //ifstream file;
+    //file.open("disk/bloque" + to_string(i - 1) + ".bin", ios::in | ios::binary);
+    i--;
+    cout<<"---------page: "<<i<<endl;
     char *frame = bufferManager->getPageOfBuuferPool(i)->data;
-    file.read(frame, this->diskController->sizeBloque);
+    //file.read(frame, this->diskController->sizeBloque);
 
-    char marcador;
+    char marcador,marc2;
     int aux = 0;
     string cad;
     int entero;
@@ -662,12 +692,20 @@ public:
     while (true)
     {
       marcador = *reinterpret_cast<int *>(frame + aux);
-      if (marcador == '*')
+      marc2 = *reinterpret_cast<int *>(frame + aux + sizeRegistro);
+      if ((marcador == '*') && (marc2 == '*'))
       {
         break;
       }
       aux += sizeRegistro;
+      //cout<<aux<<endl;
     }
+            ///////////////////////
+          int clave_,bloque_,puntero_;
+          bool id = true;
+          bloque_ = i;
+          puntero_ = aux;
+            //////////////////////
     cout << " Ingrese los datos: \n";
     for (auto &i : this->diskController->info)
     {
@@ -684,6 +722,10 @@ public:
           entero = stoi(cad);
         }
         *reinterpret_cast<int *>(&frame[aux]) = entero;
+          if (id == true) {
+            clave_ = entero;
+            id = false;
+          }
         aux += get<2>(i);
       }
       else if (get<1>(i) == "double")
@@ -713,11 +755,33 @@ public:
       }
     }
 
-    bufferManager->PinFrame(i - 1);
+    bufferManager->PinFrame(i);
     ofstream save;
-    save.open("disk/bloque" + to_string(i - 1) + ".bin", ios::out | ios::binary);
+    save.open("disk/bloque" + to_string(i) + ".bin", ios::out | ios::binary);
     save.write(frame, diskController->sizeBloque);
     save.close();
+          //Add arbol bucket
+          tree.set(clave_,bloque_,puntero_);
+          cout<<" -> "<<clave_<<" - "<<bloque_<<" - "<<puntero_<<"\n";
+              int numRegistros;
+              int pos200 = this->diskController->buscarTablaenDictionary("BPLUS"+this->diskController->nameTable);
+              pos200 += 100;
+              fstream dictionary2("dictionary/dictionary.bin", ios::in | ios::out | std::ios::binary);
+              dictionary2.seekg(pos200);
+              dictionary2.read(reinterpret_cast<char *>(&numRegistros), sizeof(int));
+              numRegistros++;
+              dictionary2.seekp(pos200);
+              dictionary2.write(reinterpret_cast<char *>(&numRegistros), sizeof(int));
+              dictionary2.close();
+              pos200 = this->diskController->buscarTablaenDictionary(this->diskController->nameTable);
+              pos200 += 100;
+              fstream dictionary10("dictionary/dictionary.bin", ios::in | ios::out | std::ios::binary);
+              dictionary10.seekg(pos200);
+              dictionary10.read(reinterpret_cast<char *>(&numRegistros), sizeof(int));
+              numRegistros++;
+              dictionary10.seekp(pos200);
+              dictionary10.write(reinterpret_cast<char *>(&numRegistros), sizeof(int));
+              dictionary10.close();
   }
 
   void insertRegistroLongitudFija(string prompt)
@@ -1434,5 +1498,60 @@ public:
 
     }
     else{ cout<<"El elemento "<<objetivo<<" no ha sido encontrado.\n"; }
+  }
+
+  //VerSector
+  void VerSector(int nSector){
+    this->diskController->tableToVector();
+    int sizeRegistro = 0;
+    for (auto &i : this->diskController->info){
+      sizeRegistro += get<2>(i);
+    }
+    int n_bloque = (nSector % disco->sectoresPorBloque == 0) ? (nSector / disco->sectoresPorBloque) : ((int)(nSector / disco->sectoresPorBloque)+1);
+    int posicion = nSector % disco->sectoresPorBloque;
+    char* frame = bufferManager->getPageOfBuuferPool(n_bloque)->data;
+    
+    cout<<"Bloque:"<<n_bloque<<endl;
+    cout<<"pos:"<<posicion<<endl;
+    int byte,fin;
+    if(posicion == 0){
+      posicion = disco->sectoresPorBloque - 1; 
+      //byte = diskController->sizeBloque - disco->capacidadDelSector + disco->capacidadDelSector % sizeRegistro;
+      byte = (posicion * disco->capacidadDelSector) -(posicion * disco->capacidadDelSector % sizeRegistro);
+      fin = byte + disco->capacidadDelSector;
+    }
+    else {
+      posicion--;
+      byte = (posicion * disco->capacidadDelSector) -(posicion * disco->capacidadDelSector % sizeRegistro);
+      fin = byte + disco->capacidadDelSector;
+    }
+    cout<<byte<<endl;
+    cout<<fin<<endl;
+
+    for (; byte < fin ; byte += sizeRegistro){
+      int aux = byte;
+      char c = *reinterpret_cast<char *>(frame + aux + sizeRegistro - 5);
+      if (c == '*'){
+        continue;
+      }
+      else if(c == '-'){
+        int free = *reinterpret_cast<int *>(frame + aux + sizeRegistro - 4);
+        cout<<"Freelist -> "<<free<<endl;
+        continue;
+      }
+      //cout<<"---"<<aux<<endl;
+      for (auto &i : this->diskController->info){
+        if (get<1>(i) == "int"){
+          fun_int(frame, aux, mytipos::_INT);
+        }
+        else if (get<1>(i) == "double"){
+          fun_double(frame, aux, mytipos::_DOUBLE);
+        }
+        else if (get<1>(i) == "str"){
+          fun_char(frame, aux, get<2>(i));
+        }
+      }
+      cout<<endl;
+    }
   }
 };
