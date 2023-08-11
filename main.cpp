@@ -223,6 +223,17 @@ int main(){
                 cin>>aux;
                 cin.ignore();
                 sistema.buscarElemento(aux);
+                // Del Arbol
+                pair<int,int> direccion = sistema.tree.get(aux);
+                int numBloque_Registro = direccion.first;
+                int ptr_Registro = direccion.second;
+                // Del Disco 
+                int numSectorsPorBloque = sistema.diskController->disco->sectoresPorBloque;
+                int numBytesPorSector = sistema.diskController->disco->capacidadDelSector;
+                int numSector_Registro = (((numBloque_Registro-1)* numSectorsPorBloque) + (ptr_Registro/numBytesPorSector))+1;
+
+                myDiskController.printInfoSector(numSector_Registro); 
+                // myDiskController.printSector(numSector_Registro);
             }
             else if (opc4 == 5) {
                 sistema.insertarRegistro();
@@ -239,7 +250,9 @@ int main(){
                 cout<<" Ingrese sector que desea ver: ";
                 cin>>aux;
                 cin.ignore();
+                myDiskController.printInfoSector(aux); 
                 sistema.VerSector(aux);
+
             }
         }
 

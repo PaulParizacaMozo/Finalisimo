@@ -49,9 +49,10 @@ public:
     }
     
     void showInfoSector() {
-        std::cout << "\t" << " IdSector: " << idSector << std::endl;
-        std::cout << "\t" << " numDePista: " << idPista << std::endl;
-        std::cout << "\t" << " numDeSuperficie: " << idSuperficie << std::endl;
-        std::cout << "\t" << " numDePlato: " << idPlato << std::endl;
+        cout<<"\n Informacion del sector: \n ";
+        cout << "\t" << " IdSector: " << idSector << std::endl;
+        cout << "\t" << " numDePista: " << idPista << std::endl;
+        cout << "\t" << " numDeSuperficie: " << idSuperficie << std::endl;
+        cout << "\t" << " numDePlato: " << idPlato << std::endl;
     }
 };

@@ -103,6 +103,26 @@ public:
         cout<<"bloqueInicial => "<<bloqueInicial<<"\n";
         cout<<"bloqueFinal => "<<bloqueFinal<<"\n";
     }
+    
+    void printInfoSector(int nSector)
+    {
+        cout << "\n" << lineas::drawLinea(75) << " | SECTOR " << nSector << " | " << lineas::drawLinea(75) << "\n";
+
+        int _pista, _superf, _plat;
+        _pista = ((nSector) % disco->numSectoresPorPista == 0) ? ((nSector) / disco->numSectoresPorPista) : ((nSector) / disco->numSectoresPorPista) + 1;
+        _superf = (_pista % disco->numPistasPorSuperficie == 0) ? (_pista / disco->numPistasPorSuperficie) : (_pista / disco->numPistasPorSuperficie) + 1;
+        _plat = (_superf % 2 == 0) ? (_superf / 2) : (_superf / 2) + 1;
+        char c;
+        cout<<"\n Informacion del Sector: "<<endl;
+        cout << "\t" << " IdSector: " << nSector << endl;
+        cout << "\t" << " numDePista: " << _pista << endl;
+        cout << "\t" << " numDeSuperficie: " << _superf << endl;
+        cout << "\t" << " numDePlato: " << _plat << endl;
+        //cout << "DATA:\n" << lineas::linea100 << lineas::linea50 << "\n";
+        //cout << "\n" << lineas::linea100 << lineas::linea50 << "\n";
+        //return {nSector,_pista,_superf,_plat};
+        //input.close();
+    }
 
     int getBloque_Of_Free_space_map()
     {
